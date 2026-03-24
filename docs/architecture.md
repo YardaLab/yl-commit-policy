@@ -29,10 +29,10 @@ yardalab-tooling/
 │   │
 │   ├─ src/
 │   │   ├─ index.ts                                   # YLDTE-12
-│   │   ├─ validator.ts                               # YLDTE-8, YLDTE-13
+│   │   ├─ validator.ts                               # YLDTE-8
+│   │   ├─ types.ts                                   # YLDTE-13
 │   │   ├─ config-loader.ts                           # YLDTE-18
 │   │   ├─ cli.ts                                     # YLDTE-9, YLDTE-12
-│   │   └─ types.ts                                   # YLDTE-13
 │   │
 │   ├─ dist/                                          # YLDTE-11
 │   ├─ tsconfig.json                                  # YLDTE-11
@@ -89,11 +89,19 @@ yardalab-tooling/
 
 ## Layer Responsibilities
 
+* Contract (YLDTE-13)
+
+  * defines types
+  * no logic
+  * no IO
+  * shared across layers
+
 * Validator (YLDTE-8)
 
   * pure logic
   * no IO
   * no config loading
+  * uses contract from YLDTE-13
 
 * Config Loader (YLDTE-18)
 
@@ -104,6 +112,20 @@ yardalab-tooling/
 * CLI (YLDTE-9)
 
   * user interaction only
+
+---
+
+## Dependencies
+
+```
+YLDTE-13 (contract)
+    ↓
+YLDTE-8 (validator)
+    ↓
+YLDTE-10 (tests)
+    ↓
+YLDTE-9 (CLI)
+```
 
 ---
 
@@ -127,7 +149,7 @@ YLDTE-7
 → regex definition
 
 YLDTE-8
-→ validation implementation (core logic)
+→ validation implementation (behavior only)
 
 YLDTE-9
 → CLI wrapper
@@ -170,8 +192,11 @@ YLDTE-12
 
 YLDTE-13
 
-* src/validator.ts
 * src/types.ts
+
+YLDTE-8
+
+* src/validator.ts
 
 YLDTE-18
 
@@ -210,7 +235,7 @@ YLDTE-18
 
 YLDTE-19
 
-* validator.ex
+* validator.ex (must match TS behavior)
 
 YLDTE-20
 
@@ -247,6 +272,7 @@ YLDTE-4
 
 * version.json is required for compatibility control
 * validator implementations must remain identical in behavior across TS and Elixir
+* TS and Elixir validators must produce identical results for identical inputs
 * commit-policy is treated as a contract
 
 ---
