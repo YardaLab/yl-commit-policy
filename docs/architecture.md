@@ -32,7 +32,7 @@ yardalab-tooling/
 │   │   ├─ validator.ts                               # YLDTE-8
 │   │   ├─ types.ts                                   # YLDTE-13
 │   │   ├─ config-loader.ts                           # YLDTE-18
-│   │   ├─ cli.ts                                     # YLDTE-9, YLDTE-12
+│   │   ├─ cli.ts                                     # YLDTE-9
 │   │
 │   ├─ dist/                                          # YLDTE-11
 │   ├─ tsconfig.json                                  # YLDTE-11
@@ -58,7 +58,7 @@ yardalab-tooling/
 │   │   │   ├─ validator.ex                           # YLDTE-8, YLDTE-19
 │   │   │   ├─ config_loader.ex                       # YLDTE-18
 │   │   │   ├─ commit_reader.ex                       # YLDTE-17
-│   │   │   └─ cli_output.ex                          # YLDTE-9, YLDTE-20
+│   │   │   └─ cli_output.ex                          # YLDTE-20
 │   │   │
 │   │   └─ mix/tasks/
 │   │       └─ yl.commit.check.ex                     # YLDTE-17
@@ -109,9 +109,24 @@ yardalab-tooling/
   * validates version
   * prepares rules
 
-* CLI (YLDTE-9)
+* CLI Flow (YLDTE-9)
 
-  * user interaction only
+  * argument parsing
+  * validator invocation
+  * exit code handling
+  * no business logic
+
+* CLI Entry (YLDTE-12)
+
+  * runtime adapter
+  * connects CLI to Node.js / NPX
+  * no logic
+
+* CLI Output (YLDTE-20)
+
+  * formatting messages
+  * developer feedback
+  * no control flow
 
 ---
 
@@ -122,9 +137,13 @@ YLDTE-13 (contract)
     ↓
 YLDTE-8 (validator)
     ↓
-YLDTE-10 (tests)
+YLDTE-18 (config loader)
     ↓
-YLDTE-9 (CLI)
+YLDTE-9 (CLI flow)
+    ↓
+YLDTE-20 (CLI output)
+    ↓
+YLDTE-12 (entrypoint)
 ```
 
 ---
@@ -152,7 +171,7 @@ YLDTE-8
 → validation implementation (behavior only)
 
 YLDTE-9
-→ CLI wrapper
+→ CLI flow
 
 YLDTE-10
 → tests
@@ -188,7 +207,6 @@ YLDTE-12
 
 * bin/commit-check.js
 * src/index.ts
-* src/cli.ts
 
 YLDTE-13
 
@@ -201,6 +219,10 @@ YLDTE-8
 YLDTE-18
 
 * src/config-loader.ts
+
+YLDTE-9
+
+* src/cli.ts
 
 YLDTE-10
 
@@ -265,6 +287,15 @@ YLDTE-15
 YLDTE-4
 
 * docs/architecture.md
+
+---
+
+## Rules
+
+* File has one responsibility (layer ownership)
+* Multiple tickets may modify a file, but must not violate its responsibility
+* No cross-layer logic leakage
+* No duplication of validation logic
 
 ---
 
