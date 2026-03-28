@@ -9,7 +9,7 @@ describe("parseCommitMessageArg", () => {
     expect(result).toBeNull();
   });
 
-  it("returns null when commit message is empty", () => {
+  it("returns null when commit message argument is whitespace only", () => {
     const result = parseCommitMessageArg(["node", "commit-check", "   "]);
 
     expect(result).toBeNull();
@@ -41,6 +41,16 @@ describe("runCli", () => {
     expect(validate).not.toHaveBeenCalled();
   });
 
+  it("returns exit code 1 when commit message argument is whitespace only", () => {
+    const validate = vi.fn<(_: string) => CommitValidationResult>();
+    const dependencies: CliDependencies = { validate };
+
+    const result = runCli(["node", "commit-check", "   "], dependencies);
+
+    expect(result.exitCode).toBe(1);
+    expect(validate).not.toHaveBeenCalled();
+  });
+
   it("invokes validator with parsed commit message", () => {
     const validate = vi.fn<(_: string) => CommitValidationResult>().mockReturnValue({
       valid: true,
@@ -54,6 +64,7 @@ describe("runCli", () => {
       dependencies,
     );
 
+    expect(validate).toHaveBeenCalledTimes(1);
     expect(validate).toHaveBeenCalledWith("feat(cli): YLDTE-9 add cli wrapper");
   });
 
