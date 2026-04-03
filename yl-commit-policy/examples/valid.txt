@@ -1,0 +1,15 @@
+feat(auth): YLDTE-123 add login support
+fix(api): YLDTE-45 handle null response
+chore(ci): YLDTE-9 update pipeline
+refactor(core): YLDTE-88 simplify validator
+feat(ui): YLDTE-101 add dashboard
+fix(db): YLDTE-77 correct migration
+perf(cache): YLDTE-66 improve lookup speed
+docs(readme): YLDTE-5 update documentation
+feat(core): YLDTE-1 init project
+fix(auth): YLDTE-2 fix token validation
+chore(deps): YLDTE-3 update dependencies
+refactor(api): YLDTE-4 improve structure
+perf(db): YLDTE-6 optimize queries
+docs(api): YLDTE-7 add endpoint docs
+feat(core): YLDTE-8 implement base logic

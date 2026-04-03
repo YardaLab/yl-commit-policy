@@ -1,0 +1,6 @@
+{
+  "name": "yl-commit-policy",
+  "build": {
+    "dockerfile": "Dockerfile"
+  }
+}

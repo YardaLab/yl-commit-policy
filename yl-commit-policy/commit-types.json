@@ -1,0 +1,10 @@
+{
+  "types": [
+    "feat",
+    "fix",
+    "chore",
+    "refactor",
+    "perf",
+    "docs"
+  ]
+}
