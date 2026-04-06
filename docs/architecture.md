@@ -30,7 +30,6 @@ yardalab-tooling/
 │   ├─ src/
 │   │   ├─ index.ts                                   # YLDTE-12
 │   │   ├─ validator.ts                               # YLDTE-8
-│   │   ├─ types.ts                                   # YLDTE-13
 │   │   ├─ config-loader.ts                           # YLDTE-18
 │   │   ├─ cli.ts                                     # YLDTE-9
 │   │
@@ -89,19 +88,12 @@ yardalab-tooling/
 
 ## Layer Responsibilities
 
-* Contract (YLDTE-13)
-
-  * defines types
-  * no logic
-  * no IO
-  * shared across layers
-
 * Validator (YLDTE-8)
 
   * pure logic
   * no IO
   * no config loading
-  * uses contract from YLDTE-13
+  * defines validation behavior
 
 * Config Loader (YLDTE-18)
 
@@ -109,12 +101,13 @@ yardalab-tooling/
   * validates version
   * prepares rules
 
-* CLI Flow (YLDTE-9)
+* CLI (YLDTE-9, YLDTE-20)
 
   * argument parsing
   * validator invocation
   * exit code handling
-  * no business logic
+  * output formatting
+  * no business logic duplication
 
 * CLI Entry (YLDTE-12)
 
@@ -122,29 +115,23 @@ yardalab-tooling/
   * connects CLI to Node.js / NPX
   * no logic
 
-* CLI Output (YLDTE-20)
-
-  * formatting messages
-  * developer feedback
-  * no control flow
-
 ---
 
-## Dependencies
+## Dependencies (System Flow)
 
-```
-YLDTE-13 (contract)
-    ↓
-YLDTE-8 (validator)
-    ↓
-YLDTE-18 (config loader)
-    ↓
-YLDTE-9 (CLI flow)
-    ↓
-YLDTE-20 (CLI output)
-    ↓
+```text
+YLDTE-8  (validator)
+   ↓
+YLDTE-9  (CLI)
+   ↓
 YLDTE-12 (entrypoint)
+   ↓
+YLDTE-23 (hooks)
 ```
+
+### Additional Dependencies
+
+* YLDTE-18 (config loader) is used by validator/CLI (not a linear step)
 
 ---
 
@@ -208,10 +195,6 @@ YLDTE-12
 * bin/commit-check.js
 * src/index.ts
 
-YLDTE-13
-
-* src/types.ts
-
 YLDTE-8
 
 * src/validator.ts
@@ -220,7 +203,7 @@ YLDTE-18
 
 * src/config-loader.ts
 
-YLDTE-9
+YLDTE-9 / YLDTE-20
 
 * src/cli.ts
 
@@ -273,7 +256,6 @@ YLDTE-21
 
 YLDTE-22
 
-* mix.exs metadata
 * CI workflow
 
 ---
@@ -296,6 +278,7 @@ YLDTE-4
 * Multiple tickets may modify a file, but must not violate its responsibility
 * No cross-layer logic leakage
 * No duplication of validation logic
+* Code must be traceable to Jira tickets
 
 ---
 
@@ -311,10 +294,10 @@ YLDTE-4
 ## Final State
 
 * every file has a clear responsibility
-* no orphan code
-* ready for CI
-* ready for publish
-* ready for scaling
+* no orphan responsibilities
+* prepared for CI integration
+* prepared for packaging
+* prepared for scaling
 
 ---
 
@@ -325,3 +308,27 @@ YLDTE-4
 * accidental code sharing between NPX and Hex
 
 These must be explicitly avoided.
+
+---
+
+## Tooling Dependency Flow
+
+This section defines how commit validation flows through the system.
+
+### Flow
+
+```text
+YLDTE-8  (validator)
+   ↓
+YLDTE-9  (CLI)
+   ↓
+YLDTE-12 (CLI entrypoint)
+   ↓
+YLDTE-23 (git hooks enforcement)
+```
+
+---
+
+## Principle
+
+System is complete only when validation is enforced, not just implemented.
