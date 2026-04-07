@@ -1,0 +1,20 @@
+{
+  "name": "yl-commit-policy",
+  "version": "1.0.0",
+  "description": "Central source of truth for YardaLab commit message conventions and validation rules.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  }
+}
