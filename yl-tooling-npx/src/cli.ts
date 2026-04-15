@@ -1,43 +1,86 @@
+#!/usr/bin/env node
+
+import { existsSync, readFileSync } from "fs";
+import kleur from "kleur";
+import { runCli, parseCommitMessageArg } from "./cli-core";
 import { validateCommit } from "./validator";
-import type { CommitValidationResult } from "./types";
 
-export interface CliDependencies {
-  validate: (message: string) => CommitValidationResult;
-}
+/**
+ * CLI entrypoint
+ * - uses cli-core for parsing + execution
+ * - handles IO (fs, console, process.exit)
+ * - supports git hook file input
+ */
 
-export interface CliExecutionResult {
-  exitCode: 0 | 1;
-}
+const VALID_MESSAGE = "OK  Commit message is valid";
 
-const defaultDependencies: CliDependencies = {
-  validate: validateCommit,
-};
+function main() {
+  const argv = process.argv;
 
-export function parseCommitMessageArg(argv: string[]): string | null {
-  const [, , ...args] = argv;
+  const commandIndex = argv.findIndex(arg => arg === "validate-commit");
+  const args = commandIndex !== -1 ? argv.slice(commandIndex + 1) : [];
 
-  if (args.length === 0) {
-    return null;
+  // =========================
+  // FILE INPUT (git commit-msg hook)
+  // =========================
+  if (commandIndex !== -1 && args.length === 1 && existsSync(args[0])) {
+    const raw = readFileSync(args[0], "utf8");
+    const firstLine = raw.split(/\r?\n/)[0]?.trim() ?? "";
+
+    const result = validateCommit(firstLine);
+
+    if (result.valid) {
+      console.log(kleur.green(`✔ ${VALID_MESSAGE}`));
+      process.exit(0);
+    }
+
+    printError(firstLine, result.errors);
+    process.exit(1);
   }
 
-  const message = args.join(" ").trim();
+  // =========================
+  // STANDARD CLI FLOW (delegated to cli-core)
+  // =========================
+  const result = runCli(argv, {
+    validate: validateCommit,
+  });
 
-  return message.length > 0 ? message : null;
-}
-
-export function runCli(
-  argv: string[],
-  dependencies: CliDependencies = defaultDependencies,
-): CliExecutionResult {
-  const commitMessage = parseCommitMessageArg(argv);
-
-  if (commitMessage === null) {
-    return { exitCode: 1 };
+  if (result.exitCode === 0) {
+    console.log(kleur.green(`✔ ${VALID_MESSAGE}`));
+    process.exit(0);
   }
 
-  const result = dependencies.validate(commitMessage);
+  // re-run for error details
+  const parsedMessage = parseCommitMessageArg(argv) ?? "";
+  const validation = validateCommit(parsedMessage);
 
-  return {
-    exitCode: result.valid ? 0 : 1,
-  };
+  printError(parsedMessage, validation.errors);
+  process.exit(1);
 }
+
+function printError(message: string, errors: string[]) {
+  console.error(kleur.red("ERROR: Invalid commit message"));
+
+  console.error("");
+  console.error(kleur.white("Message:"));
+  console.error(`  ${kleur.dim(message || '""')}`);
+
+  if (errors && errors.length > 0) {
+    console.error("");
+    console.error(kleur.yellow("Reasons:"));
+
+    for (const err of errors) {
+      console.error(`  - ${kleur.red(err)}`);
+    }
+  }
+
+  console.error("");
+  console.error(kleur.dim("Expected format:"));
+  console.error(kleur.dim("  <type>(<scope>): <TICKET> <description>"));
+
+  console.error("");
+  console.error(kleur.dim("Example:"));
+  console.error(kleur.dim("  feat(core): YLDTE-11 add validation"));
+}
+
+main();

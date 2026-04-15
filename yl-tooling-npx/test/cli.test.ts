@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
-import { parseCommitMessageArg, runCli, type CliDependencies } from "../src/cli";
+import { parseCommitMessageArg, runCli, type CliDependencies } from "../src/cli-core";
 import type { CommitValidationResult } from "../src/types";
 
 describe("parseCommitMessageArg", () => {
   it("returns null when no commit message argument is provided", () => {
-    const result = parseCommitMessageArg(["node", "commit-check"]);
+    const result = parseCommitMessageArg(["node", "validate-commit"]);
 
     expect(result).toBeNull();
   });
 
   it("returns null when commit message argument is whitespace only", () => {
-    const result = parseCommitMessageArg(["node", "commit-check", "   "]);
+    const result = parseCommitMessageArg(["node", "validate-commit", "   "]);
 
     expect(result).toBeNull();
   });
@@ -18,7 +18,7 @@ describe("parseCommitMessageArg", () => {
   it("returns the commit message from argv", () => {
     const result = parseCommitMessageArg([
       "node",
-      "commit-check",
+      "validate-commit",
       "feat(cli):",
       "YLDTE-9",
       "add",
@@ -35,7 +35,7 @@ describe("runCli", () => {
     const validate = vi.fn<(_: string) => CommitValidationResult>();
     const dependencies: CliDependencies = { validate };
 
-    const result = runCli(["node", "commit-check"], dependencies);
+    const result = runCli(["node", "validate-commit"], dependencies);
 
     expect(result.exitCode).toBe(1);
     expect(validate).not.toHaveBeenCalled();
@@ -45,7 +45,17 @@ describe("runCli", () => {
     const validate = vi.fn<(_: string) => CommitValidationResult>();
     const dependencies: CliDependencies = { validate };
 
-    const result = runCli(["node", "commit-check", "   "], dependencies);
+    const result = runCli(["node", "validate-commit", "   "], dependencies);
+
+    expect(result.exitCode).toBe(1);
+    expect(validate).not.toHaveBeenCalled();
+  });
+
+  it("returns exit code 1 for unknown command", () => {
+    const validate = vi.fn<(_: string) => CommitValidationResult>();
+    const dependencies: CliDependencies = { validate };
+
+    const result = runCli(["node", "unknown-command"], dependencies);
 
     expect(result.exitCode).toBe(1);
     expect(validate).not.toHaveBeenCalled();
@@ -60,7 +70,7 @@ describe("runCli", () => {
     const dependencies: CliDependencies = { validate };
 
     runCli(
-      ["node", "commit-check", "feat(cli):", "YLDTE-9", "add", "cli", "wrapper"],
+      ["node", "validate-commit", "feat(cli):", "YLDTE-9", "add", "cli", "wrapper"],
       dependencies,
     );
 
@@ -77,7 +87,23 @@ describe("runCli", () => {
     };
 
     const result = runCli(
-      ["node", "commit-check", "feat(cli):", "YLDTE-9", "add", "cli", "wrapper"],
+      ["node", "validate-commit", "feat(cli):", "YLDTE-9", "add", "cli", "wrapper"],
+      dependencies,
+    );
+
+    expect(result.exitCode).toBe(0);
+  });
+
+  it("returns exit code 0 for a valid commit message passed as a single argument", () => {
+    const dependencies: CliDependencies = {
+      validate: vi.fn().mockReturnValue({
+        valid: true,
+        errors: [],
+      }),
+    };
+
+    const result = runCli(
+      ["node", "validate-commit", "feat(cli): YLDTE-9 add cli wrapper"],
       dependencies,
     );
 
@@ -93,7 +119,7 @@ describe("runCli", () => {
     };
 
     const result = runCli(
-      ["node", "commit-check", "bad", "message"],
+      ["node", "validate-commit", "bad", "message"],
       dependencies,
     );
 
@@ -110,7 +136,7 @@ describe("runCli", () => {
 
     const argv = [
       "node",
-      "commit-check",
+      "validate-commit",
       "feat(cli):",
       "YLDTE-9",
       "add",

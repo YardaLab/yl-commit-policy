@@ -11,7 +11,8 @@ export type CommitError =
   | "MISSING_TYPE"
   | "MISSING_SCOPE"
   | "MISSING_TICKET"
-  | "MISSING_DESCRIPTION";
+  | "MISSING_DESCRIPTION"
+  | "INVALID_TYPE";
 
 export type CommitValidationResult = {
   valid: boolean;
