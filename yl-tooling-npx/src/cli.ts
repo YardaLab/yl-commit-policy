@@ -16,31 +16,23 @@ const VALID_MESSAGE = "OK  Commit message is valid";
 
 function main() {
   const argv = process.argv;
+  const parsedMessage = parseCommitMessageArg(argv);
 
-  const commandIndex = argv.findIndex(arg => arg === "validate-commit");
-  const args = commandIndex !== -1 ? argv.slice(commandIndex + 1) : [];
-
-  // =========================
   // FILE INPUT (git commit-msg hook)
-  // =========================
-  if (commandIndex !== -1 && args.length === 1 && existsSync(args[0])) {
-    const raw = readFileSync(args[0], "utf8");
+  if (parsedMessage && existsSync(parsedMessage)) {
+    const raw = readFileSync(parsedMessage, "utf8");
     const firstLine = raw.split(/\r?\n/)[0]?.trim() ?? "";
+    const validation = validateCommit(firstLine);
 
-    const result = validateCommit(firstLine);
-
-    if (result.valid) {
+    if (validation.valid) {
       console.log(kleur.green(`✔ ${VALID_MESSAGE}`));
       process.exit(0);
     }
 
-    printError(firstLine, result.errors);
+    printError(firstLine, validation.errors);
     process.exit(1);
   }
 
-  // =========================
-  // STANDARD CLI FLOW (delegated to cli-core)
-  // =========================
   const result = runCli(argv, {
     validate: validateCommit,
   });
@@ -50,11 +42,8 @@ function main() {
     process.exit(0);
   }
 
-  // re-run for error details
-  const parsedMessage = parseCommitMessageArg(argv) ?? "";
-  const validation = validateCommit(parsedMessage);
-
-  printError(parsedMessage, validation.errors);
+  const validation = validateCommit(parsedMessage ?? "");
+  printError(parsedMessage ?? "", validation.errors);
   process.exit(1);
 }
 
@@ -65,7 +54,7 @@ function printError(message: string, errors: string[]) {
   console.error(kleur.white("Message:"));
   console.error(`  ${kleur.dim(message || '""')}`);
 
-  if (errors && errors.length > 0) {
+  if (errors.length > 0) {
     console.error("");
     console.error(kleur.yellow("Reasons:"));
 
