@@ -41,7 +41,7 @@ yl-tooling validate-commit .git/COMMIT_EDITMSG
 
 ## Commit Format
 
-```
+```text
 <type>(<scope>): <TICKET> <description>
 ```
 
@@ -55,12 +55,12 @@ feat(core): YLDTE-11 add CLI support
 
 ## Allowed Types
 
-* feat
-* fix
-* chore
-* refactor
-* perf
-* docs
+- feat
+- fix
+- chore
+- refactor
+- perf
+- docs
 
 ---
 
@@ -68,15 +68,29 @@ feat(core): YLDTE-11 add CLI support
 
 The following commits are automatically allowed:
 
-* Merge commits
-* Revert commits
+- Merge commits
+- Revert commits
 
 ---
 
-## Errors
+## Error Output
 
-```
-❌ Invalid commit message
+Example invalid output:
+
+```text
+ERROR: Invalid commit message
+
+Message:
+  random
+
+Reasons:
+  - INVALID_FORMAT
+
+Expected format:
+  <type>(<scope>): <TICKET> <description>
+
+Example:
+  feat(core): YLDTE-11 add validation
 ```
 
 ---
@@ -105,6 +119,6 @@ node bin/yl-tooling.js validate-commit "feat(core): YLDTE-11 test"
 
 ## Notes
 
-* This CLI validates only the first line of the commit message
-* Commit body is ignored
-* Configuration loading (regex, types) will be implemented in future tasks
+- This CLI validates only the first line of the commit message
+- Commit body is ignored
+- Direct configuration loading is temporary and will be refined in follow-up tasks
