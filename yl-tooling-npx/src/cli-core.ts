@@ -50,12 +50,6 @@ export function runCli(
     return { exitCode: 1 };
   }
 
-  // 🔥 WHITELIST FOR GIT-GENERATED COMMITS
-  // prevents breaking workflow for merge & revert
-  if (/^(Merge|Revert) /.test(message)) {
-    return { exitCode: 0 };
-  }
-
   const result = dependencies.validate(message);
 
   if (!result.valid) {
