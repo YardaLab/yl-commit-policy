@@ -19,3 +19,18 @@ export type CommitValidationResult = {
   errors: CommitError[];
   parsed?: CommitParsed;
 };
+
+export interface CommitRegexFile {
+  pattern: string;
+  flags?: string;
+}
+
+export interface CommitTypesFile {
+  types: string[];
+}
+
+export interface CommitPolicyConfig {
+  pattern: string;
+  flags: string;
+  allowedTypes: string[];
+}

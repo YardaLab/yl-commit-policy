@@ -1,7 +1,14 @@
-import type { CommitValidationResult } from "./types";
+import type {
+  CommitPolicyConfig,
+  CommitValidationResult,
+} from "./types";
 
 export interface CliDependencies {
-  validate: (message: string) => CommitValidationResult;
+  loadConfig: () => CommitPolicyConfig;
+  validate: (
+    message: string,
+    config: CommitPolicyConfig
+  ) => CommitValidationResult;
 }
 
 export interface CliExecutionResult {
@@ -9,7 +16,7 @@ export interface CliExecutionResult {
 }
 
 function resolveCommandIndex(argv: string[]): number {
-  return argv.findIndex(arg => arg === "validate-commit");
+  return argv.findIndex((arg) => arg === "validate-commit");
 }
 
 export function parseCommitMessageArg(argv: string[]): string | null {
@@ -36,7 +43,7 @@ export function parseCommitMessageArg(argv: string[]): string | null {
 
 export function runCli(
   argv: string[],
-  dependencies: CliDependencies,
+  dependencies: CliDependencies
 ): CliExecutionResult {
   const commandIndex = resolveCommandIndex(argv);
 
@@ -50,7 +57,8 @@ export function runCli(
     return { exitCode: 1 };
   }
 
-  const result = dependencies.validate(message);
+  const config = dependencies.loadConfig();
+  const result = dependencies.validate(message, config);
 
   if (!result.valid) {
     return { exitCode: 1 };

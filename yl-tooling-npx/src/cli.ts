@@ -3,6 +3,7 @@
 import { existsSync, readFileSync } from "fs";
 import kleur from "kleur";
 import { runCli, parseCommitMessageArg } from "./cli-core";
+import { loadCommitPolicyConfig } from "./config-loader";
 import { validateCommit } from "./validator";
 
 /**
@@ -17,12 +18,13 @@ const VALID_MESSAGE = "OK  Commit message is valid";
 function main() {
   const argv = process.argv;
   const parsedMessage = parseCommitMessageArg(argv);
+  const config = loadCommitPolicyConfig();
 
   // FILE INPUT (git commit-msg hook)
   if (parsedMessage && existsSync(parsedMessage)) {
     const raw = readFileSync(parsedMessage, "utf8");
     const firstLine = raw.split(/\r?\n/)[0]?.trim() ?? "";
-    const validation = validateCommit(firstLine);
+    const validation = validateCommit(firstLine, config);
 
     if (validation.valid) {
       console.log(kleur.green(`✔ ${VALID_MESSAGE}`));
@@ -34,6 +36,7 @@ function main() {
   }
 
   const result = runCli(argv, {
+    loadConfig: () => config,
     validate: validateCommit,
   });
 
@@ -42,7 +45,7 @@ function main() {
     process.exit(0);
   }
 
-  const validation = validateCommit(parsedMessage ?? "");
+  const validation = validateCommit(parsedMessage ?? "", config);
   printError(parsedMessage ?? "", validation.errors);
   process.exit(1);
 }
