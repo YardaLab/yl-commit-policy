@@ -2,23 +2,16 @@
 set -eu
 
 COMMIT_MSG_FILE="$1"
-
-# resolve repo root (important for subdirs / git worktrees)
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-# path to local CLI
-CLI="$REPO_ROOT/yl-tooling-npx/src/index.ts"
+DIST_CLI="$REPO_ROOT/yl-tooling-npx/dist/cli.js"
+SRC_CLI="$REPO_ROOT/yl-tooling-npx/src/cli.ts"
 
-# safety check
-if [ ! -f "$CLI" ]; then
-  echo "❌ Validator not found at $CLI" >&2
+if [ -f "$DIST_CLI" ]; then
+  node "$DIST_CLI" validate-commit "$COMMIT_MSG_FILE"
+elif [ -f "$SRC_CLI" ]; then
+  npx tsx "$SRC_CLI" validate-commit "$COMMIT_MSG_FILE"
+else
+  echo "❌ CLI not found (dist nor src)" >&2
   exit 1
 fi
-
-# run validator via tsx
-if ! npx tsx "$CLI" commit-check "$COMMIT_MSG_FILE"; then
-  echo "❌ Commit message validation failed" >&2
-  exit 1
-fi
-
-exit 0

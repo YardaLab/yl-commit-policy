@@ -1,14 +1,17 @@
-import {
+import type {
   CommitValidationResult,
-  CommitError
+  CommitError,
+  CommitPolicyConfig,
 } from "./types";
 
-const COMMIT_REGEX = /^(\w+)\(([\w\-]+)\):\s([A-Z]+-\d+)\s(.+)$/;
+const WHITELIST_REGEX = /^(Merge|Revert) /;
 
-export function validateCommit(message: string): CommitValidationResult {
+export function validateCommit(
+  message: string,
+  config: CommitPolicyConfig
+): CommitValidationResult {
   const normalized = message?.trim();
 
-  // EMPTY
   if (!normalized) {
     return {
       valid: false,
@@ -16,9 +19,23 @@ export function validateCommit(message: string): CommitValidationResult {
     };
   }
 
-  const match = normalized.match(COMMIT_REGEX);
+  // Git system commits
+  if (WHITELIST_REGEX.test(normalized)) {
+    return {
+      valid: true,
+      errors: [],
+      parsed: {
+        type: "system",
+        scope: "",
+        ticket: "",
+        description: normalized,
+      },
+    };
+  }
 
-  // INVALID FORMAT
+  const commitRegex = new RegExp(config.pattern);
+  const match = normalized.match(commitRegex);
+
   if (!match) {
     return {
       valid: false,
@@ -30,11 +47,14 @@ export function validateCommit(message: string): CommitValidationResult {
 
   const errors: CommitError[] = [];
 
-  // EXTRA GUARDS (future-proofing + explicitness)
   if (!type) errors.push("MISSING_TYPE");
   if (!scope) errors.push("MISSING_SCOPE");
   if (!ticket) errors.push("MISSING_TICKET");
   if (!description) errors.push("MISSING_DESCRIPTION");
+
+  if (type && !config.allowedTypes.includes(type)) {
+    errors.push("INVALID_TYPE");
+  }
 
   if (errors.length > 0) {
     return {
