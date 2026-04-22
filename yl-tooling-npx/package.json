@@ -7,13 +7,15 @@
   },
   "type": "commonjs",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node ./scripts/copy-default-policy.mjs",
     "typecheck": "tsc -p tsconfig.dev.json",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "keywords": [
     "yardalab",
