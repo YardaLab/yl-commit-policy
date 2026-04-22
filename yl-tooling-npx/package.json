@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "YardaLab developer tooling CLI",
   "bin": {
-    "yl-tooling": "./bin/yl-tooling.js"
+    "yl-tooling": "bin/yl-tooling.js"
   },
   "type": "commonjs",
   "scripts": {
@@ -23,13 +23,21 @@
     "cli",
     "tooling"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YardaLab/yl-commit-policy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YardaLab/yl-commit-policy/issues"
+  },
+  "homepage": "https://github.com/YardaLab/yl-commit-policy#readme",
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.9.3",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.1",
+    "tsx": "^4.21.0"
   },
   "dependencies": {
-    "kleur": "^4.1.5",
-    "tsx": "^4.21.0"
+    "kleur": "^4.1.5"
   }
 }
