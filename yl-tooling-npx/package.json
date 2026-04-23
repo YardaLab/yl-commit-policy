@@ -8,6 +8,7 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node ./scripts/copy-default-policy.mjs",
+    "prepare": "npm run build",
     "typecheck": "tsc -p tsconfig.dev.json",
     "test": "vitest run",
     "test:watch": "vitest"
