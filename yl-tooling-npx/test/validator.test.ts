@@ -4,6 +4,7 @@ import type { CommitPolicyConfig } from "../src/types";
 
 const testConfig: CommitPolicyConfig = {
   pattern: "^(\\w+)\\(([\\w\\-]+)\\):\\s([A-Z]+-\\d+)\\s(.+)$",
+  flags: "",
   allowedTypes: [
     "feat",
     "fix",

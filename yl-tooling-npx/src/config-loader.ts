@@ -7,15 +7,11 @@ import type {
 } from "./types";
 
 /**
- * Resolves the default commit policy directory.
- *
- * Expected monorepo layout:
- * yl-commit-policy/
- * ├─ yl-commit-policy/
- * └─ yl-tooling-npx/
+ * Resolves the bundled default policy directory shipped
+ * with the yl-tooling-npx package artifact.
  */
 function resolveDefaultPolicyDir(): string {
-  return path.resolve(__dirname, "..", "..", "yl-commit-policy");
+  return path.resolve(__dirname, "default-policy");
 }
 
 function readJsonFile<T>(filePath: string): T {
