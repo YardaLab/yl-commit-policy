@@ -1,5 +1,5 @@
 {
-  "name": "yl-tooling",
+  "name": "@yardalab/yl-tooling",
   "version": "0.1.0",
   "description": "YardaLab developer tooling CLI",
   "bin": {
@@ -19,10 +19,14 @@
     "README.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "yardalab",
     "cli",
-    "tooling"
+    "tooling",
+    "commit-validation"
   ],
   "repository": {
     "type": "git",
